@@ -29,6 +29,12 @@ public class PirateBayBot extends TelegramLongPollingBot
                     e.printStackTrace();
                 }
             }
+            else if(update.getMessage().getText().equals("/topaudio")
+            || update.getMessage().getText().equals("/topvideo")
+            || update.getMessage().getText().equals("/topapps")
+            || update.getMessage().getText().equals("/topgames")
+            || update.getMessage().getText().equals("/topother"))
+                find(update);
             else if(update.getMessage().getText().equals("/donate"))
             {
                 try {
@@ -51,61 +57,112 @@ public class PirateBayBot extends TelegramLongPollingBot
                     e.printStackTrace();
                 }
             }
-            else
+            else if(update.getMessage().getText().split(" ")[0].equals("/send"))
             {
-                new Thread(() -> {
-                    Document doc = null;
-                    List<Torrent> torrents = new ArrayList<>();
+                // /send 125125512 Hello there my dear friend!
 
+                String[] strs = update.getMessage().getText().split(" ");
+
+                int id = Integer.parseInt(strs[1]);
+
+                String msg = "";
+
+                for (int i = 2; i < strs.length; i++)
+                {
+                    msg += strs[i] + " ";
+                }
+
+                if (update.getMessage().getChatId() == 34540125)
+                {
                     try {
-                        sendMsg("Searching...", update.getMessage().getChatId());
+                        sendMsg(msg, id);
                     } catch (TelegramApiException e) {
                         e.printStackTrace();
                     }
-                    String clientUrl = update.getMessage().getText();
-
-                    String result = urls[0] + clientUrl.replace(" ", "+") + "&page=0&orderby=99";
-
-                    try {
-                        doc = Jsoup.connect(result)
-                                .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
-                                .referrer("http://www.google.com")
-                                .ignoreHttpErrors(true)
-                                .get();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    Elements elements = doc.select("#main-content #searchResult tbody tr td");
-
-                    for(Element element: elements)
-                    {
-                        if(element.attr("class").equals("") && element.attr("align").equals(""))
-                        {
-                            Torrent torrent = new Torrent();
-                            torrent.setName(element.select(".detName a").text());
-                            torrent.setDesc(element.select(".detDesc").text());
-                            torrent.setMagnet(element.select("a").get(1).attr("href"));
-                            if (!torrent.getName().equals("")) torrents.add(torrent);
-                        }
-                    }
-
-                    for (Torrent torrent: torrents)
-                    {
-                        SendMessage message = new SendMessage()
-                                .setChatId(update.getMessage().getChatId())
-                                .setText("*" + torrent.getName() + "\n\n" + torrent.getDesc() + "\n\n" + "*" + "`" + torrent.getMagnet() + "`")
-                                .enableMarkdown(true);
-
-                        try {
-                            execute(message);
-                        } catch (TelegramApiException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                }).start();
+                }
             }
+            else
+            {
+                new Thread(() -> find(update)).start();
+            }
+        }
+    }
+
+    private void find(Update update)
+    {
+        Document doc = null;
+        List<Torrent> torrents = new ArrayList<>();
+
+        try {
+            sendMsg("Searching...", update.getMessage().getChatId());
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+        String clientUrl = update.getMessage().getText();
+
+
+        try {
+            sendMsg(update.getMessage().getChatId() + " is looking for: " + clientUrl, 34540125);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+
+        String result = urls[0] + clientUrl.replace(" ", "+") + "&page=0&orderby=99";
+
+        if(clientUrl.equals("/topaudio")) result = "https://thepiratebay.myunblock.com/top/100";
+        else if(clientUrl.equals("/topvideo")) result = "https://thepiratebay.myunblock.com/top/200";
+        else if(clientUrl.equals("/topapps")) result = "https://thepiratebay.myunblock.com/top/300";
+        else if(clientUrl.equals("/topgames")) result = "https://thepiratebay.myunblock.com/top/400";
+        else if(clientUrl.equals("/topother")) result = "https://thepiratebay.myunblock.com/top/600";
+
+        try {
+            doc = Jsoup.connect(result)
+                    .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
+                    .referrer("http://www.google.com")
+                    .ignoreHttpErrors(true)
+                    .get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Elements elements = doc.select("#main-content #searchResult tbody tr td");
+
+        for(Element element: elements)
+        {
+            if(element.attr("class").equals("") && element.attr("align").equals(""))
+            {
+                Torrent torrent = new Torrent();
+                torrent.setName(element.select(".detName a").text());
+                torrent.setDesc(element.select(".detDesc").text());
+                torrent.setMagnet(element.select("a").get(1).attr("href"));
+                if (!torrent.getName().equals("")) torrents.add(torrent);
+            }
+        }
+
+        for (Torrent torrent: torrents)
+        {
+            SendMessage message = new SendMessage()
+                    .setChatId(update.getMessage().getChatId())
+                    .setText("*" + torrent.getName() + "\n\n" + torrent.getDesc() + "\n\n" + "*" + "`" + torrent.getMagnet() + "`")
+                    .enableMarkdown(true);
+
+            try {
+                execute(message);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(torrents.size() == 0)
+        {
+            try {
+                sendMsg("Unable to find anything. Try to make more understandable request.\n" +
+                        "If you are search for a film, don't type 'subtitles', it is gonna return you nothing.\n" +
+                        "Choose films with subtitles from all found films.", update.getMessage().getChatId());
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 
