@@ -6,11 +6,8 @@ public class Torrent
     private String name;
     private String desc;
     private String magnet;
-    private String key;
-
-    public Torrent(){
-        this.key = String.valueOf(generateKey() + new Date().getTime());
-    }
+    
+    public Torrent(){}
 
     public Torrent(String name, String desc, String magnet)
     {
@@ -35,10 +32,6 @@ public class Torrent
         this.desc = desc;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
     public String getMagnet() {
         return magnet;
     }
@@ -47,34 +40,12 @@ public class Torrent
         this.magnet = magnet;
     }
 
-    public String getKey()
-    {
-        return key;
-    }
-
     @Override
     public String toString() {
         return "Torrent{" +
                 "name='" + name + '\'' +
                 ", desc='" + desc + '\'' +
                 ", magnet='" + magnet + '\'' +
-                ", key='" + key + '\'' +
                 '}';
-    }
-
-    public String generateKey()
-    {
-        Random rand = new Random();
-
-        String possible = "qwertyuiopasdfghjklzxcvbnm1234567890";
-
-        String res = "";
-
-        for(int i = 0; i < 10; i++)
-        {
-            res += possible.charAt(rand.nextInt(possible.length()));
-        }
-
-        return res;
     }
 }
