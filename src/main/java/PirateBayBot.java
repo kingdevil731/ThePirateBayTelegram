@@ -29,12 +29,6 @@ public class PirateBayBot extends TelegramLongPollingBot
                     e.printStackTrace();
                 }
             }
-            else if(update.getMessage().getText().equals("/topaudio")
-            || update.getMessage().getText().equals("/topvideo")
-            || update.getMessage().getText().equals("/topapps")
-            || update.getMessage().getText().equals("/topgames")
-            || update.getMessage().getText().equals("/topother"))
-                find(update);
             else if(update.getMessage().getText().equals("/donate"))
             {
                 try {
