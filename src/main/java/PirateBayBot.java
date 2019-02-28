@@ -40,28 +40,6 @@ public class PirateBayBot extends TelegramLongPollingBot{
                         e.printStackTrace();
                     }
                 }
-                else if (update.getMessage().getText().equals("/donate"))
-                {
-                    try {
-                        sendMsg("Unfortunately, only cryptocurrencies available\n\n" +
-                                "Bitcoin: `1D2NDVjioKiMntQpkqdHF1KjMH4CjM65Fj`\n" +
-                                "\n" +
-                                "Litecoin: `LVjYXuLTtEd3N7MULrtuRoUTUdjrMFS93k`\n" +
-                                "\n" +
-                                "Dogecoin: `DMBhZiqVeR2Eywgsp39VWAZPy1cxGz42XH`\n" +
-                                "\n" +
-                                "Ethereum: `0xe9C004AE90F4fCBAF74b122732BE334c5517eacF`\n" +
-                                "\n" +
-                                "Ethereum Classic: `0xe9C004AE90F4fCBAF74b122732BE334c5517eacF`\n" +
-                                "\n" +
-                                "Zcash: `t1bCmPzEQBpNTQShhnHGTC2sFhiBrhthdFv`\n" +
-                                "\n" +
-                                "Stellar: `GBD3VKBL2OOF42D4QAOAVYZ4LOSD6ULFHD64IKF5LNNS4AM5JXMS6HN7`" +
-                                "\n\nThanks a lot!!", update.getMessage().getChatId());
-                    } catch (TelegramApiException e) {
-                        e.printStackTrace();
-                    }
-                }
                 else if (update.getMessage().getText().split(" ")[0].equals("/send"))
                 {
                   /*
